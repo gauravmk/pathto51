@@ -1,0 +1,17 @@
+.SquareMapContainer {
+  margin: auto;
+}
+
+.SquareMapCanvas {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.Square {
+  border-left: 1px solid white;
+  border-top: 1px solid white;
+  color: white;
+  text-align: center;
+}
