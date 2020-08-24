@@ -54,6 +54,9 @@ const Square = ({ stateCode, color, faded, onClick }) => {
   if (faded) {
     style.color = "#ffffff80";
   }
+  if (!stateCode) {
+    style.cursor = "auto";
+  }
   return (
     <div onClick={onClick} className="Square" style={style}>
       {stateCode}
