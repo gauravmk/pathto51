@@ -1,21 +1,19 @@
 import races_txt from "../data/races.csv";
-import _ from "lodash";
+import Papa from "papaparse";
+import { createStore } from "redux";
 
-export const allSenators = [];
-
-let storeInited = false;
-
-export const initStore = () => {
-  if (storeInited) {
-    return;
-  }
-
-  // Parse csv
-  const lines = races_txt.split("\n");
-  const keys = lines[0].split(",").map(s => s.trim());
-  _.slice(lines, 1).forEach(row => {
-    const vals = row.split(",").map(s => s.trim());
-    allSenators.push(_.zipObject(keys, vals));
-  });
-  storeInited = true;
+const initialState = {
+  allSenators: Papa.parse(races_txt, { header: true }).data,
+  selectedSenateRace: null
 };
+
+function reduce(state = {}, action) {
+  switch (action.type) {
+    case "PICK_SENATE_RACE":
+      return { ...state, selectedSenateRace: action.race };
+    default:
+      return state;
+  }
+}
+
+export let store = createStore(reduce, initialState);

@@ -1,16 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
 import SquareMap from "SquareMap";
-import { initStore } from "store";
-
+import SenateRaceDetails from "SenateRaceDetails";
+import { store } from "store";
+import { Provider } from "react-redux";
 import { Container, Row } from "react-bootstrap";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "index.css";
 
 const Dashboard = () => {
-  initStore();
   return (
     <Container>
       <Row className="mt-5">
@@ -19,8 +18,14 @@ const Dashboard = () => {
       <Row className="mt-5">
         <SquareMap />
       </Row>
+      <SenateRaceDetails />
     </Container>
   );
 };
 
-ReactDOM.render(<Dashboard />, document.getElementById("root"));
+ReactDOM.render(
+  <Provider store={store}>
+    <Dashboard />
+  </Provider>,
+  document.getElementById("root")
+);

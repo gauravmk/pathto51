@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { allSenators } from "store";
-
+import { connect } from "react-redux";
 import { Dropdown } from "react-bootstrap";
 
 import _ from "lodash";
 
 const KEY_ORDER = [
   "no_election_d",
-  "independent",
+  "no_election_i",
   "safe_d",
   "likely_d",
   "leans_d",
@@ -30,52 +29,22 @@ const RATERS = [
   "270towin"
 ];
 
-const senatorConfig = {
-  no_election_d: {
-    color: "#0055FF",
-    label: "Democrats not up for election"
-  },
-  safe_d: {
-    color: "#3779FF",
-    label: "Safe Democrat"
-  },
-  likely_d: {
-    color: "#6D9EFF",
-    label: "Likely Democrat"
-  },
-  leans_d: {
-    color: "#A4C2FF",
-    label: "Leans Democrat"
-  },
-  tossup: {
-    color: "#B3B3B3",
-    label: "Tossup"
-  },
-  leans_r: {
-    color: "#FDAEBB",
-    label: "Leans Republican"
-  },
-  likely_r: {
-    color: "#FC7188",
-    label: "Likely Republican"
-  },
-  safe_r: {
-    color: "#FB4866",
-    label: "Safe Republican"
-  },
-  no_election_r: {
-    color: "#d90429",
-    label: "Republicans not up for election"
-  },
-  independent: {
-    color: "#048966",
-    label: "Independents"
-  }
+const ColorConfig = {
+  no_election_d: "#0055FF",
+  safe_d: "#3779FF",
+  likely_d: "#6D9EFF",
+  leans_d: "#A4C2FF",
+  tossup: "#B3B3B3",
+  leans_r: "#FDAEBB",
+  likely_r: "#FC7188",
+  safe_r: "#FB4866",
+  no_election_r: "#d90429",
+  no_election_i: "#048966"
 };
 
-const SQ_WIDTH = 44;
+const SQ_WIDTH = 50;
 
-const Square = ({ stateCode, color, faded }) => {
+const Square = ({ stateCode, color, faded, onClick }) => {
   const style = {
     width: SQ_WIDTH,
     height: SQ_WIDTH,
@@ -86,18 +55,17 @@ const Square = ({ stateCode, color, faded }) => {
     style.color = "#ffffff80";
   }
   return (
-    <div className="Square" style={style}>
+    <div onClick={onClick} className="Square" style={style}>
       {stateCode}
     </div>
   );
 };
 
-const SquareMap = () => {
+const SquareMap = ({ allSenators, pickSenateRace }) => {
   const [rater, setRater] = useState("Combined");
 
   let squares = [];
   KEY_ORDER.forEach(k => {
-    const { color } = senatorConfig[k];
     allSenators
       .filter(v => v[rater] == k)
       .forEach(v => {
@@ -110,9 +78,10 @@ const SquareMap = () => {
 
         squares.push(
           <Square
-            color={color}
+            color={ColorConfig[k]}
             stateCode={v["State Code"]}
-            faded={k.startsWith("no_election") || k == "independent"}
+            faded={k.startsWith("no_election")}
+            onClick={() => pickSenateRace(v)}
           />
         );
       });
@@ -120,10 +89,11 @@ const SquareMap = () => {
 
   return (
     <div className="SquareMapContainer" style={{ width: 22 * SQ_WIDTH }}>
-      <div className="float-right">
+      <div className="float-left">Click on a state to learn more about the race</div>
+      <div className="float-right" style={{ display: "none" }}>
         <h5 className="d-inline-block mr-3">Rater:</h5>
         <Dropdown className="d-inline-block">
-          <Dropdown.Toggle variant="info">{rater}</Dropdown.Toggle>
+          <Dropdown.Toggle variant="secondary">{rater}</Dropdown.Toggle>
           <Dropdown.Menu>
             {RATERS.map(r => (
               <Dropdown.Item onClick={() => setRater(r)}>{r}</Dropdown.Item>
@@ -138,4 +108,12 @@ const SquareMap = () => {
   );
 };
 
-export default SquareMap;
+const mapStateToProps = state => ({
+  allSenators: state.allSenators
+});
+
+const mapDispatchToProps = dispatch => ({
+  pickSenateRace: race => dispatch({ type: "PICK_SENATE_RACE", race })
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SquareMap);
